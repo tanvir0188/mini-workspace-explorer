@@ -1,63 +1,123 @@
 "use client"
-import { useActionState, useEffect } from "react"
-import { registerAction, googleLoginAction } from "@/app/(auth)/_actions/authActions"
-import { useSearchParams } from "next/navigation"
+import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
-import { SelectValue } from "../ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 
+import { registerAction } from "@/app/(auth)/_actions/authActions"
 
 export default function RegisterForm() {
-    const searchParams = useSearchParams();
-    const redirectTo = searchParams.get("redirectTo") ?? "";
+    const router = useRouter();
+    const redirectTo = "auth/login";
 
-    // Connect to server action
-    const [state, action, pending] = useActionState(registerAction.bind(null, redirectTo), null as any);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
 
-    useEffect(() => {
-        if (!state) return;
-        if (!state.success && state.statusCode === 400) toast.error(state.message || "Registration failed");
-        if (!state.success && state.statusCode === 500) toast.error(state.message || "Registration failed");
-        if (state.success) toast.success(state.message || "Registration successful");
-    }, [state]);
+    const [errors, setErrors] = useState<Record<string, string[] | undefined>>({});
+    const [isPending, setIsPending] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        setErrors({});
+        setIsPending(true);
+
+        try {
+            const formData = new FormData();
+
+            formData.append("email", email.trim());
+            formData.append("password", password);
+            formData.append("name", name.trim());
+
+            const result = await registerAction(
+                redirectTo,
+                {
+                    success: false,
+                    statusCode: 200,
+                    message: "",
+                    data: null
+                },
+                formData
+            );
+
+            if (!result.success) {
+                toast.error(result.message || "Registration failed.");
+                return;
+            }
+
+            toast.success(result.message || "Registration successful.");
+
+            router.push(redirectTo);
+        } catch (error) {
+            console.error("Registration error:", error);
+
+            toast.error("Registration failed. Please try again.");
+        } finally {
+            setIsPending(false);
+        }
+    };
 
     return (
-        <form action={action} className="space-y-4 max-w-sm mx-auto mt-20 border p-6 rounded-lg shadow-sm">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto mt-20 border p-6 rounded-lg shadow-sm">
             <Link href="/" className="font-bold text-center text-4xl block mb-2">RentNest</Link>
             <h1 className="text-2xl font-bold text-center mb-6">Register</h1>
-            <Input name="email" type="email" placeholder="Email" defaultValue={state?.data?.email || ""} required />
-            {state?.errors?.email && <p className="text-red-500">{state.errors.email[0]}</p>}
-            <Input name="password" type="password" placeholder="Password" defaultValue={state?.data?.password || ""} required />
-            {state?.errors?.password && <p className="text-red-500">{state.errors.password[0]}</p>}
-            <Input name="name" type="text" placeholder="Name" defaultValue={state?.data?.name || ""} required />
-            {state?.errors?.name && <p className="text-red-500">{state.errors.name[0]}</p>}
 
-            <Select name="role" defaultValue={state?.data?.role || ""} required>
-                <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select Role" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="LANDLORD">Landlord</SelectItem>
-                    <SelectItem value="TENANT">Tenant</SelectItem>
-                </SelectContent>
-            </Select>
-
-            {state?.errors?.role && <p className="text-red-500">{state.errors.role[0]}</p>}
-            <Button type="submit" className="w-full" disabled={pending}>
-                {pending ? "Registering..." : "Register"}
-            </Button>
-
-            <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-zinc-200 dark:border-zinc-800">
-                <Button type="button" variant="default" className="w-full bg-red-600 hover:bg-red-700 text-white" disabled={pending} onClick={() => googleLoginAction()}>
-                    Continue with Google
-                </Button>
+            <div>
+                <Input
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isPending}
+                />
+                {errors?.email && <p className="text-red-500 text-sm mt-1">{errors.email[0]}</p>}
             </div>
 
-            <p className="text-center mt-4">Already have an account? <Link className="text-blue-600 hover:underline" href="/auth/login">Login</Link></p>
-        </form>
+            <div>
+                <Input
+                    name="password"
+                    type="password"
+                    placeholder="Password (min. 8 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isPending}
+                />
+                {errors?.password && <p className="text-red-500 text-sm mt-1">{errors.password[0]}</p>}
+            </div>
 
+            <div>
+                <Input
+                    name="name"
+                    type="text"
+                    placeholder="Full Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    disabled={isPending}
+                />
+                {errors?.name && <p className="text-red-500 text-sm mt-1">{errors.name[0]}</p>}
+            </div>
+
+
+
+            <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Registering..." : "Register"}
+            </Button>
+
+            <p className="text-center mt-4">
+                Already have an account?{" "}
+                <Link className="text-blue-600 hover:underline" href={redirectTo ? `/auth/login?redirectTo=${encodeURIComponent(redirectTo)}` : "/auth/login"}>
+                    Login
+                </Link>
+            </p>
+        </form>
     );
 }
+
