@@ -3,17 +3,19 @@ import { useState, useTransition } from "react"
 import {
     loginAction,
 } from "@/app/(auth)/_actions/authActions"
-import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import Link from "next/link"
 import { LoginSchema } from "@/lib/types"
 import { StoredUsers } from "@/lib/storedDataTypes/user"
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRedirectToDashboard } from "@/utils/redirectToDashboard";
 
 export default function LoginForm() {
-    const searchParams = useSearchParams();
-    const redirectTo = searchParams.get("redirectTo") ?? "";
+    useRedirectToDashboard();
+    const router = useRouter();
+    const redirectTo = "/dashboard";
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -63,7 +65,17 @@ export default function LoginForm() {
                 return;
             }
 
-            await loginAction(existUser);
+            const result = await loginAction(redirectTo, existUser);
+
+            if (!result.success) {
+                toast.error(result.message);
+                return;
+            }
+
+            toast.success(result.message);
+
+            // Redirect after successful login
+            window.location.href = redirectTo || "/dashboard";
         } catch (error) {
             console.error("Login error:", error);
             toast.error("Login failed. Please try again.");

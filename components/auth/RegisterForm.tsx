@@ -1,14 +1,15 @@
 "use client"
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { registerAction } from "@/app/(auth)/_actions/registerActions"
+import { useRedirectToDashboard } from "@/utils/redirectToDashboard"
 
 export default function RegisterForm() {
+    useRedirectToDashboard();
     const router = useRouter();
     const redirectTo = "auth/login";
 
