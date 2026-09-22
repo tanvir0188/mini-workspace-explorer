@@ -1,0 +1,6 @@
+Task List:
+[x] Define hierarchical tree data structure
+[x] Build Windows File Explorer UI
+[x] Implement stack data structure for recent items
+[x] Sync physical text files to public/workspace
+[ ] Launch workspace explorer!

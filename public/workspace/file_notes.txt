@@ -1,0 +1,8 @@
+Webbly Project Notes
+-------------------
+1. Architecture: Next.js App Router + Tailwind CSS
+2. Tree structure algorithm: Root-based hierarchy with parentId pointers
+3. Disk sync: Text files physically saved in /public/workspace/
+4. UI: Windows 11 Fluent style explorer layout
+
+5. Updated from browser subagent test!
