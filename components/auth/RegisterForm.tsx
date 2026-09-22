@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-
-import { registerAction } from "@/app/(auth)/_actions/authActions"
+import { registerAction } from "@/app/(auth)/_actions/registerActions"
 
 export default function RegisterForm() {
     const router = useRouter();

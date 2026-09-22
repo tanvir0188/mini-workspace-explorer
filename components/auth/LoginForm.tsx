@@ -22,27 +22,50 @@ export default function LoginForm() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         setErrors({});
         setIsSubmitting(true);
 
         try {
             const formData = {
-                email: email.trim(),
-                password,
+                email: email.trim().toLowerCase(),
+                password
             };
 
-            const result = await loginAction(formData);
-            if (result && !result.success) {
-                toast.error(result.message || "Invalid credentials or user not found.");
-                if (result.error) {
-                    setErrors(result.error);
-                }
-            }
-        } catch (err: any) {
-            if (err?.message?.includes("NEXT_REDIRECT")) {
+            const validated = LoginSchema.safeParse(formData);
+
+            if (!validated.success) {
+                setErrors(
+                    validated.error.flatten().fieldErrors
+                );
+
                 return;
             }
-            console.error("Login error:", err);
+
+            const users: StoredUsers = JSON.parse(
+                localStorage.getItem("users") || "[]"
+            );
+
+            const existUser = users.find(
+                (user) =>
+                    user.email === formData.email &&
+                    user.password === formData.password
+            );
+
+            if (!existUser) {
+                toast.error("Invalid email or password");
+
+                setErrors({
+                    email: ["Invalid email"],
+                    password: ["Invalid password"]
+                });
+
+                return;
+            }
+
+            await loginAction(existUser);
+        } catch (error) {
+            console.error("Login error:", error);
             toast.error("Login failed. Please try again.");
         } finally {
             setIsSubmitting(false);

@@ -20,7 +20,6 @@ export default async function NavbarAuth() {
     if (user) {
         const userEmail = user.email || user.profile?.email || "";
         const userName = user.name || user.profile?.name || userEmail;
-        const role = user.role || user.profile?.role || "USER";
         const initials = userName ? userName.substring(0, 2).toUpperCase() : "US";
 
         return (
@@ -45,12 +44,12 @@ export default async function NavbarAuth() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/${role.toLowerCase()}`} className="cursor-pointer w-full flex items-center">
+                        <Link href={`/dashboard`} className="cursor-pointer w-full flex items-center">
                             Dashboard
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link href={`/dashboard/${role.toLowerCase()}/profile`} className="cursor-pointer w-full flex items-center">
+                        <Link href={`/dashboard/profile`} className="cursor-pointer w-full flex items-center">
                             Profile
                         </Link>
                     </DropdownMenuItem>
