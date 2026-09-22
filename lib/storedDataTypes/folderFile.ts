@@ -1,6 +1,11 @@
 export type FolderFile = {
-    id: String;
-    name: String;
+    id: string;
+    name: string;
     type: "folder" | "file";
-    parentId?: String;
-}
+    parentId: string | null;
+    createdAt?: number;
+    updatedAt?: number;
+    size?: number;
+};
+
+export type WorkspaceItem = FolderFile;
