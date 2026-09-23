@@ -321,9 +321,11 @@ export function WorkspaceExplorer() {
                 <ExplorerSidebar
                     items={items}
                     currentFolderId={currentFolderId}
+                    selectedFileId={activeEditingFile?.id || (selectedIds.length === 1 ? selectedIds[0] : null)}
                     isOpen={isSidebarOpen}
                     onCloseMobile={() => setIsSidebarOpen(false)}
                     onSelectFolder={navigateToFolder}
+                    onOpenFile={handleOpenFile}
                 />
 
                 <ExplorerMainPanel

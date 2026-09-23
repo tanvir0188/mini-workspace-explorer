@@ -1,12 +1,6 @@
 "use client";
 
 export const getMe = () => {
-    if (typeof window === "undefined") {
-        return {
-            success: false,
-            message: "SSR"
-        };
-    }
     const auth = localStorage.getItem("auth");
 
     if (!auth) {
