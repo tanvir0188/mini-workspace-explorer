@@ -98,10 +98,10 @@ export default function NavbarAuth() {
 
                     <DropdownMenuItem asChild>
                         <Link
-                            href="/dashboard/profile"
+                            href="/dashboard/workspaces"
                             className="cursor-pointer w-full flex items-center"
                         >
-                            Profile
+                            Workspaces
                         </Link>
                     </DropdownMenuItem>
 
